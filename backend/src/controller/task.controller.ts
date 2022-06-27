@@ -1,34 +1,47 @@
-import { Request, Response } from "express";
-import { writeFileSync, readFileSync } from "fs";
-import path from "path";
+import { Request, Response } from 'express';
+import { writeFileSync, readFileSync } from 'fs';
+import path from 'path';
 
 const handlers = {
-	Get: (req: Request, res: Response) => {
-		const { params } = req;
+  Get: (req: Request, res: Response) => {
+    const { params } = req;
 
-		const task = readFileSync(
-			path.resolve(__dirname, `../${params.title}.txt`)
-		);
+    const task = readFileSync(
+      path.resolve(__dirname, `../${params.title}.txt`)
+    );
 
-		res.send(task.toString());
-	},
+    res.status(204);
+    res.send(task.toString());
+  },
 
-	Post: (req: Request, res: Response) => {
-		const { body } = req;
+  Post: (req: Request, res: Response) => {
+    const { body } = req;
 
-		writeFileSync(`dist/${body.title}.txt`, JSON.stringify(body.msg));
+    writeFileSync(`dist/${body.title}.txt`, JSON.stringify(body.msg));
 
-		res.status(201);
-		res.send("Task registered!");
-	},
+    res.status(201);
+    res.send('Task registered!');
+  },
 
-	Patch: (req: Request, res: Response) => {
-		res.send("Hello World");
-	},
+  Patch: (req: Request, res: Response) => {
+    const { params } = req;
+    const { body } = req;
 
-	Delete: (req: Request, res: Response) => {
-		res.send("Hello World");
-	},
+    const task = readFileSync(
+      path.resolve(__dirname, `../${params.title}.txt`)
+    );
+
+    const updateContent = task.toString().replace(body.title, body.msg);
+
+    writeFileSync(`dist/${params.title}.txt`, JSON.stringify(updateContent));
+
+    res.status(204);
+    res.send('Content updated!');
+  },
+
+  Delete: (req: Request, res: Response) => {
+    res.send('Hello World');
+  }
 };
 
 export default handlers;
