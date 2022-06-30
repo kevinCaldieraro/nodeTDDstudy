@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { writeFileSync, readFileSync } from 'fs';
+import { writeFileSync, readFileSync, unlinkSync } from 'fs';
 import path from 'path';
 
 const handlers = {
@@ -10,7 +10,7 @@ const handlers = {
       path.resolve(__dirname, `../${params.title}.txt`)
     );
 
-    res.status(204);
+    res.status(200);
     res.send(task.toString());
   },
 
@@ -27,20 +27,18 @@ const handlers = {
     const { params } = req;
     const { body } = req;
 
-    const task = readFileSync(
-      path.resolve(__dirname, `../${params.title}.txt`)
-    );
+    writeFileSync(`dist/${params.title}.txt`, JSON.stringify(body.newMsg));
 
-    const updateContent = task.toString().replace(body.title, body.msg);
-
-    writeFileSync(`dist/${params.title}.txt`, JSON.stringify(updateContent));
-
-    res.status(204);
+    res.status(200);
     res.send('Content updated!');
   },
 
   Delete: (req: Request, res: Response) => {
-    res.send('Hello World');
+    const { body } = req;
+
+    unlinkSync(`dist/${body.file}.txt`);
+    res.status(200);
+    res.send('Task deleted!');
   }
 };
 
